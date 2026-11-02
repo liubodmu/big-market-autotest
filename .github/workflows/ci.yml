@@ -77,6 +77,8 @@ jobs:
                 create database if not exists big_market_02 default character set utf8mb4;"
           mysql -h 127.0.0.1 -P 13306 -uroot -p123456 big_market \
             < big-market/docs/dev-ops/environment/mysql/sql/big_market.sql
+          mysql -h 127.0.0.1 -P 13306 -uroot -p123456 big_market \
+            < big-market/docs/dev-ops/environment/mysql/sql/big_market_master.sql
           mysql -h 127.0.0.1 -P 13306 -uroot -p123456 big_market_01 \
             < big-market/docs/dev-ops/environment/mysql/sql/big_market_shards.sql
           mysql -h 127.0.0.1 -P 13306 -uroot -p123456 big_market_02 \

@@ -32,7 +32,7 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 1. 启动 MySQL(13306)/Redis(16379)/RabbitMQ(5672) 三个服务容器
 2. 从 `${{ github.repository_owner }}/big-market` 克隆被测工程，并用
    `docs/dev-ops/environment/mysql/sql/big_market.sql` + `big_market_shards.sql`
-   初始化主库和两个分库
+   和 `big_market_master.sql` 初始化主库、策略/活动元数据和两个分库
 3. `mvn package` 编译 `big-market-app.jar` 后台启动，等 `/api/v1/activity/query_account_quota` 通
 4. 跑全部 pytest 用例，上传 `reports/junit.xml` 作为流水线产物
 
