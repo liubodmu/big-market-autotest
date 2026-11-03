@@ -38,7 +38,7 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 
 ## 用例范围
 
-当前覆盖 `docs/api-activity.md` 中描述的三个活动接口的正反用例：
+按模块覆盖（42 条设计矩阵见 `docs/test-design.md` 第五节，41 条已落地）：
 
 - `POST /api/v1/activity/partake`，含无效 activityId 的异常分支
 - `POST /api/v1/activity/query_account_quota`
@@ -48,6 +48,7 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 - `POST /api/v1/raffle/random_raffle`
 - HTTP 协议层异常（405、非法 JSON）
 - 数据驱动矩阵：`testdata/readonly_cases.yaml`（11 条只读接口正反用例）
+- 跨用户（双用户）隔离场景
 
 完整测试设计见 `docs/test-design.md`（等价类 / 边界值 / 场景法 / 错误推测映射）。
 

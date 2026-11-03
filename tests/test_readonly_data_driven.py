@@ -13,5 +13,4 @@ from common.yaml_loader import assert_expectation, load_cases
 )
 def test_readonly_endpoint_case(api: HttpClient, case: dict):
     resp = api.request(case["endpoint"], case["payload"])
-    assert resp.status_code == 200, f"{case['id']} HTTP 层先通过，实际 {resp.status_code}"
     assert_expectation(resp, case["expect"], case["id"])

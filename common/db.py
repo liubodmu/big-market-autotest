@@ -76,12 +76,29 @@ class DbClient:
     # ---------- 断言辅助 ----------
 
     def get_account_quota(self, user_id: str, activity_id: int):
-        return self.query_one(
-            "select total_count, total_count_surplus, day_count, day_count_surplus, "
-            "month_count, month_count_surplus "
-            "from raffle_activity_account where user_id = %s and activity_id = %s",
-            (user_id, activity_id),
-        )
+        """读取三层账户额度。
+
+        两个分库都被测试数据工厂种了相同的行，而应用只会更新其中一个
+        分库，所以这里取“剩余额度最小的那一行”，即应用实际写入的分库。
+        只有一个分库有行时直接返回该行。
+        """
+        rows = []
+        for cfg in self._each_config():
+            with self._connect(cfg) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "select total_count, total_count_surplus, day_count, day_count_surplus, "
+                        "month_count, month_count_surplus "
+                        "from raffle_activity_account where user_id = %s and activity_id = %s",
+                        (user_id, activity_id),
+                    )
+                    row = cursor.fetchone()
+            if row is not None:
+                rows.append(dict(row, _db=cfg["database"]))
+
+        if not rows:
+            return None
+        return min(rows, key=lambda r: r.get("total_count_surplus", 0))
 
     def find_order_row(self, order_id: str):
         for table in self._sharded_tables("user_raffle_order"):

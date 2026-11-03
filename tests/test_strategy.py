@@ -58,3 +58,29 @@ def test_random_raffle_award_in_strategy_pool(api: HttpClient):
         matching = [a for a in award_pool if a["awardId"] == data["awardId"]]
         assert matching, f"抽奖结果 {data['awardId']} 应在奖池内"
         assert data["awardIndex"] == matching[0]["sort"]
+
+
+def test_random_raffle_invalid_strategy_returns_error(api: HttpClient):
+    payload = {"strategyId": 999999}
+    resp = api.request("raffle/random_raffle", payload)
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["code"] == "0001", f"不存在的策略抽奖应返回 0001，实际 {body}"
+
+
+def test_random_raffle_missing_body_returns_illegal_parameter(api: HttpClient):
+    resp = api.request("raffle/random_raffle", {})
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["code"] == "0002", f"缺 strategyId 应返回 0002，实际 {body}"
+
+
+def test_query_raffle_award_list_missing_payload_returns_empty(api: HttpClient):
+    resp = api.request("raffle/query_raffle_award_list", {})
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["code"] == "0000", f"缺 body 应返回 0000，实际 {body}"
+    assert body["data"] == [], f"缺 body 应返回空列表，实际 {body}"

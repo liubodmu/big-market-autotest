@@ -89,3 +89,15 @@ cases:
       http_status: 200
       code: "0000"
       data_empty_list: true
+
+  - id: "RO-QUOTA-006"
+    desc: "activityId 类型不匹配 → HTTP 400（JSON 反序列化挡住）"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "xiaofuge", activityId: "not-a-number" }
+    expect: { http_status: 400 }
+
+  - id: "RO-RPOOL-004"
+    desc: "strategyId 类型不匹配 → HTTP 400（JSON 反序列化挡住）"
+    endpoint: "raffle/query_raffle_award_list"
+    payload: { strategyId: "not-a-number" }
+    expect: { http_status: 400 }
