@@ -154,6 +154,7 @@
 | B3 | 无效 strategyId 查询奖池返回 `0000`+空列表，没有语义化错误码 | `POST /api/v1/raffle/query_raffle_award_list` body `{"strategyId":999999}` | 建议返回专用错误码 |
 | B6 | 同一用户高并发首次参与抽奖：产生 **26 张** create 未使用订单 + 26 次额度扣减（预期各 1），竞态位置 `AbstractRaffleActivityPartake.createOrder` | 400 并发 15s，同一 userId；风暴前后 DB 核对（`docs/perf-report.md`） | 对 `(user_id, activity_id)` 做唯一性保护，或事务内 select for update / Redis 锁 |
 | B7 | 并发 ≳200 时出现 HTTP 连接拒绝：写闭环 200 档 5 个、400 档 289 个 `HttpHostConnectException` | 阶梯压测；根因在 `application-dev.yml` Tomcat `threads.max=200` / `accept-count=10` | 调大 accept-count 与连接池上限，重走 400/800 阶梯验证 |
+| B8 | 兜底奖品节点对空 `ruleValue` 抛裸 `NumberFormatException`：`RuleLuckAwardLogicTreeNode` 里 `if (split.length == 0)` 是死代码（`split` 永远至少返回 1 个元素，空串守卫永远不到） | `node.logic(userId, strategyId, awardId, "")` → `Integer.valueOf("")` 抛 NFE；用单测固化现状（`RuleLuckAwardLogicTreeNodeTest.luck_award_empty_config_throws_raw_number_format_exception`） | 修 guard 逻辑并换成业务异常 `AppException`，配置缺失应有明确错误码 |
 
 ## 三、数据准备
 

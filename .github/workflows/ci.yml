@@ -91,7 +91,7 @@ jobs:
 
       - name: Run backend unit tests
         run:
-          mvn -B -q -pl big-market-app -am test -Dtest=AwardStateVoTest,PartakeQuotaRulesTest -DskipTests=false -DfailIfNoTests=false
+mvn -B -q -pl big-market-app -am test -Dtest=AwardStateVoTest,PartakeQuotaRulesTest,BackListLogicChainTest,RuleWeightLogicChainTest,DefaultLogicChainTest,RuleLockLogicTreeNodeTest,RuleStockLogicTreeNodeTest,RuleLuckAwardLogicTreeNodeTest -DskipTests=false -DfailIfNoTests=false
         working-directory: big-market
 
       - name: Start service
