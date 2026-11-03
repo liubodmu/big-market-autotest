@@ -1,0 +1,91 @@
+# 只读接口数据驱动矩阵：全部无副作用，可重复运行
+# (shape / 断言键由 common/yaml_loader.py 解释)
+cases:
+  - id: "RO-QUOTA-001"
+    desc: "有效用户+活动 → 三层额度齐全且在合法区间"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "xiaofuge", activityId: 100301 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_keys: [totalCount, totalCountSurplus, dayCount, dayCountSurplus, monthCount, monthCountSurplus]
+      data_numeric_nonneg: [totalCount, totalCountSurplus, dayCount, dayCountSurplus, monthCount, monthCountSurplus]
+      data_fields_equal: { userId: "xiaofuge", activityId: 100301 }
+
+  - id: "RO-QUOTA-002"
+    desc: "不存在的用户 → ERR_BIZ_006"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "nonexistent_user_xyz", activityId: 100301 }
+    expect: { http_status: 200, code: "ERR_BIZ_006" }
+
+  - id: "RO-QUOTA-003"
+    desc: "userId 为空 → ERR_BIZ_006"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "", activityId: 100301 }
+    expect: { http_status: 200, code: "ERR_BIZ_006" }
+
+  - id: "RO-QUOTA-004"
+    desc: "额度为负数也能被容错处理（等价类：非法数值输入）"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "xiaofuge", activityId: -100301 }
+    expect: { http_status: 200, code: "ERR_BIZ_006" }
+
+  - id: "RO-QUOTA-005"
+    desc: "极小 activityId 边界 → ERR_BIZ_006"
+    endpoint: "activity/query_account_quota"
+    payload: { userId: "xiaofuge", activityId: 1 }
+    expect: { http_status: 200, code: "ERR_BIZ_006" }
+
+  - id: "RO-AWARD-001"
+    desc: "有效用户+活动 → 中奖记录接口可用"
+    endpoint: "activity/query_user_award_record"
+    payload: { userId: "xiaofuge", activityId: 100301 }
+    expect: { http_status: 200, code: "0000" }
+
+  - id: "RO-AWARD-002"
+    desc: "不存在的 activityId → 0000 + 空列表（接口契约现状）"
+    endpoint: "activity/query_user_award_record"
+    payload: { userId: "xiaofuge", activityId: 999999 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_empty_list: true
+
+  - id: "RO-AWARD-003"
+    desc: "userId 为空 → 0000 + 空列表"
+    endpoint: "activity/query_user_award_record"
+    payload: { userId: "", activityId: 100301 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_empty_list: true
+
+  - id: "RO-RPOOL-001"
+    desc: "已装配策略 → 奖池列表字段完备"
+    endpoint: "raffle/query_raffle_award_list"
+    payload: { strategyId: 100006 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_items_count_min: 1
+      data_items_required: [awardId, awardTitle, sort]
+      data_items_numeric_min: { awardId: 1 }
+      data_items_nonempty: [awardTitle]
+
+  - id: "RO-RPOOL-002"
+    desc: "不存在的策略 → 0000 + 空列表"
+    endpoint: "raffle/query_raffle_award_list"
+    payload: { strategyId: 999999 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_empty_list: true
+
+  - id: "RO-RPOOL-003"
+    desc: "极小 strategyId 边界 → 0000 + 空列表"
+    endpoint: "raffle/query_raffle_award_list"
+    payload: { strategyId: 1 }
+    expect:
+      http_status: 200
+      code: "0000"
+      data_empty_list: true

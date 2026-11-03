@@ -43,6 +43,21 @@
 | S2 幂等复用 | 存在未使用订单 | 重复 partake 返回同一 order，额度不变 |
 | S3 抽奖命中奖池 | 策略 100006 有 101~108 奖品 | 三次 random_raffle 均命中奖池集合 |
 
+### 数据驱动（YAML）· 只读接口矩阵
+
+只读接口（`query_account_quota` / `query_user_award_record` / `query_raffle_award_list`）
+没有副作用，最适合把“输入差异 → 预期差异”这种高频用例抽到 `testdata/readonly_cases.yaml`，
+通过 `pytest.mark.parametrize` 一键生成：
+
+| ID | 端点 | 输入 | 预期 |
+|---|---|---|---|
+| RO-QUOTA-001..005 | query_account_quota | 有效/无效 user、无效/极小 activityId | 0000+字段完整 / ERR_BIZ_006 |
+| RO-AWARD-001..003 | query_user_award_record | 有效/空 user、无效 activityId | 0000+记录或空列表 |
+| RO-RPOOL-001..003 | query_raffle_award_list | 有效/极小/无效 strategyId | 0000+奖池或空列表 |
+
+> RO-RPOOL-002/003 与 RO-AWARD-002/003 现在都断言“成功码 + 空列表”，这是接口契约现状的快照，
+> 若后端改成专用错误码，这两个用例也会随之改写（当前留作观察点，未按缺陷处理）。
+
 ### 错误推测
 
 | 异常输入 | 预期 |

@@ -47,6 +47,7 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 - `POST /api/v1/raffle/query_raffle_award_list`
 - `POST /api/v1/raffle/random_raffle`
 - HTTP 协议层异常（405、非法 JSON）
+- 数据驱动矩阵：`testdata/readonly_cases.yaml`（11 条只读接口正反用例）
 
 完整测试设计见 `docs/test-design.md`（等价类 / 边界值 / 场景法 / 错误推测映射）。
 
