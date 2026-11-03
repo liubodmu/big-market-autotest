@@ -89,6 +89,11 @@ jobs:
           mvn -B -q -pl big-market-app -am -DskipTests package
         working-directory: big-market
 
+      - name: Run backend unit tests
+        run:
+          mvn -B -q -pl big-market-app -am test -Dtest=AwardStateVoTest,PartakeQuotaRulesTest -DskipTests=false -DfailIfNoTests=false
+        working-directory: big-market
+
       - name: Start service
         run: |
           cd big-market/big-market-app/target

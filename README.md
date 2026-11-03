@@ -49,6 +49,7 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 - HTTP 协议层异常（405、非法 JSON）
 - 数据驱动矩阵：`testdata/readonly_cases.yaml`（11 条只读接口正反用例）
 - 跨用户（双用户）隔离场景
+- 单元的单元级测试：`big-market-app/src/test/java/cn/bugstack/unit/`（JUnit5 + Mockito，13 条；在 CI 的 `Run backend unit tests` 步骤执行）
 
 完整测试设计见 `docs/test-design.md`（等价类 / 边界值 / 场景法 / 错误推测映射）。
 
