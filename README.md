@@ -50,8 +50,17 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 - 数据驱动矩阵：`testdata/readonly_cases.yaml`（11 条只读接口正反用例）
 - 跨用户（双用户）隔离场景
 - 单元的单元级测试：`big-market-app/src/test/java/cn/bugstack/unit/`（JUnit5 + Mockito，13 条；在 CI 的 `Run backend unit tests` 步骤执行）
+- 性能测试：`performance/`（JMeter CLI 三组压测计划 + 造数/解析/错误聚类/清理脚本 + `docs/perf-report.md` 指标与根因）
 
 完整测试设计见 `docs/test-design.md`（等价类 / 边界值 / 场景法 / 错误推测映射）。
+
+## 性能结论速览
+
+| 场景 | 饱和吞吐 | 主要瓶颈 | 缺陷记录 |
+|---|---|---|---|
+| 只读 query_account_quota | 100 并发 ≈490 req/s | 应用侧 Tomcat/连接池 | — |
+| 写闭环 partake | 400 档 ≈262 req/s，p95 3.4s | Tomcat 200 上限 + accept-count=10 连接拒绝 | B7 |
+| 同用户并发风暴 400 | ≈230 req/s | 业务层竞态 | **B6：单用户 26 张未使用订单 + 26 次扣减** |
 
 `test_partake_order_and_quota_consistency` 会把接口返回值与 MySQL 落库数据对比：
 

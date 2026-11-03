@@ -152,6 +152,8 @@
 | B1 | `strategy_armory` 传不存在的 strategyId 时接口长时间无响应（探测超时） | `GET /api/v1/raffle/strategy_armory?strategyId=999999` | 装配前先校验策略存在性并短路返回 |
 | B2 | `raffle_activity.uq_strategy_id` 唯一约束：同一策略只能挂一个活动 | 插入第二个测试活动复用同一 strategy_id → `Duplicate entry` | 业务上是否合理需跟开发确认（通常一个策略服务多活动才合理）；测试数据也因此为每个测试活动各配一个占位策略号 |
 | B3 | 无效 strategyId 查询奖池返回 `0000`+空列表，没有语义化错误码 | `POST /api/v1/raffle/query_raffle_award_list` body `{"strategyId":999999}` | 建议返回专用错误码 |
+| B6 | 同一用户高并发首次参与抽奖：产生 **26 张** create 未使用订单 + 26 次额度扣减（预期各 1），竞态位置 `AbstractRaffleActivityPartake.createOrder` | 400 并发 15s，同一 userId；风暴前后 DB 核对（`docs/perf-report.md`） | 对 `(user_id, activity_id)` 做唯一性保护，或事务内 select for update / Redis 锁 |
+| B7 | 并发 ≳200 时出现 HTTP 连接拒绝：写闭环 200 档 5 个、400 档 289 个 `HttpHostConnectException` | 阶梯压测；根因在 `application-dev.yml` Tomcat `threads.max=200` / `accept-count=10` | 调大 accept-count 与连接池上限，重走 400/800 阶梯验证 |
 
 ## 三、数据准备
 
