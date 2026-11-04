@@ -123,9 +123,8 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          curl -fsSL -o /tmp/allure.tgz https://repo1.maven.org/maven2/io/qameta/allure/allure-commandline/2.29.0/allure-commandline-2.29.0.tgz
-          tar -xzf /tmp/allure.tgz -C /tmp
-          /tmp/allure-commandline-2.29.0/bin/allure generate allure-results -o allure-report --clean
+          npm install -g allure-commandline@2.29.0
+          allure generate allure-results -o allure-report --clean
 
       - name: Upload Allure results and report
         if: always()
