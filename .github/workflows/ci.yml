@@ -119,7 +119,22 @@ mvn -B -q -pl big-market-app -am test -Dtest=AwardStateVoTest,PartakeQuotaRulesT
         env:
           BIG_MARKET_BASE_URL: http://127.0.0.1:8091
         run:
-          pytest -q --junitxml=reports/junit.xml
+          pytest -q --alluredir=allure-results --junitxml=reports/junit.xml
+
+      - name: Generate Allure report
+        run: |
+          curl -fsSL -o /tmp/allure.tgz https://repo1.maven.org/maven2/io/qameta/allure/allure-commandline/2.29.0/allure-commandline-2.29.0.tgz
+          tar -xzf /tmp/allure.tgz -C /tmp
+          /tmp/allure-commandline-2.29.0/bin/allure generate allure-results -o allure-report --clean
+
+      - name: Upload Allure results and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: |
+            allure-results/
+            allure-report/
 
       - name: Upload test reports
         if: always()

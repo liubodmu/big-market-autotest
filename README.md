@@ -36,6 +36,17 @@ BIG_MARKET_BASE_URL=http://other-host:8091 pytest
 3. `mvn package` 编译 `big-market-app.jar` 后台启动，等 `/api/v1/activity/query_account_quota` 通
 4. 跑全部 pytest 用例，上传 `reports/junit.xml` 作为流水线产物
 
+## Allure 报告
+
+本地生成结果：
+
+```bash
+pytest -q --alluredir=allure-results
+```
+
+CI 会用 allure-commandline 把 `allure-results/` 渲染成可视化报告并随流水线产物上传
+（Actions 页面 → 对应 run → Artifacts → `allure-report`，下载后本地 `allure open` 查看）。
+
 ## 用例范围
 
 按模块覆盖（42 条设计矩阵见 `docs/test-design.md` 第五节，41 条已落地）：
