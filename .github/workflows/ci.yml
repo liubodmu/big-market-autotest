@@ -135,6 +135,7 @@ jobs:
           path: |
             allure-results/
             allure-report/
+          if-no-files-found: ignore
 
       - name: Upload test reports
         if: always()
@@ -142,3 +143,4 @@ jobs:
         with:
           name: test-reports
           path: reports/
+          if-no-files-found: ignore
